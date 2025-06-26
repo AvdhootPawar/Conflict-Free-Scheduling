@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Academic Timetable Generator - Conflict Free Scheduling{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-calendar-alt"></i> Academic Timetable Generator</h1>
+        <p>Generate academic timetables with faculty assignments and export options.</p>
+    </div>
+</section>
+
+<section class="form-section">
+    <div class="container">
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form id="timetableForm" action="{{ url_for('academic_timetable') }}" method="post">
+            <div class="form-grid">
+                <div class="form-card config-card">
+                    <h3><i class="fas fa-cog"></i> Configuration</h3>
+
+                    <div class="form-group">
+                        <label for="academic_year">Academic Year:</label>
+                        <select id="academic_year" name="academic_year" class="form-control">
+                            <option value="1">Year 1</option>
+                            <option value="2">Year 2</option>
+                            <option value="3">Year 3</option>
+                            <option value="4">Year 4</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start_time">Daily Start Time:</label>
+                        <input type="time" id="start_time" name="start_time" value="08:00" class="form-control" required>
+                        <small class="form-text">School day start time.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="working_days">Working Days (Mon-Sun):</label>
+                        <input type="number" id="working_days" name="working_days" min="1" max="7" value="5" class="form-control" required>
+                         <small class="form-text">Number of days per week (1=Mon, 5=Mon-Fri).</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="num_subjects">Number of Subjects:</label>
+                        <input type="number" id="num_subjects" name="num_subjects" min="1" value="5" class="form-control" onchange="window.updateSubjectFields()" required>
+                    </div>
+                </div>
+
+                <div class="form-card lecture-card">
+                    <h3><i class="fas fa-chalkboard-teacher"></i> Lecture Configuration (Per Subject)</h3>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="theory_lectures">Theory Lectures/Week:</label>
+                            <input type="number" id="theory_lectures" name="theory_lectures" min="0" value="2" class="form-control" required>
+                        </div>
+                        <div class="form-group half">
+                            <label for="theory_duration">Duration (hours):</label>
+                            <input type="number" id="theory_duration" name="theory_duration" min="0.5" step="0.25" value="1.0" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="lab_lectures">Lab Sessions/Week:</label>
+                            <input type="number" id="lab_lectures" name="lab_lectures" min="0" value="1" class="form-control" required>
+                        </div>
+                        <div class="form-group half">
+                            <label for="lab_duration">Duration (hours):</label>
+                            <input type="number" id="lab_duration" name="lab_duration" min="0.5" step="0.25" value="2.0" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="tutorial_lectures">Tutorials/Week:</label>
+                            <input type="number" id="tutorial_lectures" name="tutorial_lectures" min="0" value="1" class="form-control" required>
+                        </div>
+                        <div class="form-group half">
+                            <label for="tutorial_duration">Duration (hours):</label>
+                            <input type="number" id="tutorial_duration" name="tutorial_duration" min="0.5" step="0.25" value="1.0" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="break_duration">Break Duration (hours):</label>
+                        <input type="number" id="break_duration" name="break_duration" min="0.25" step="0.25" value="0.5" class="form-control" required>
+                        <small class="form-text">A break will be added after approx. 3 consecutive hours.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card" id="subjectCard">
+                <h3><i class="fas fa-book"></i> Subject & Faculty Information</h3>
+                <div id="subjectContainer" class="subject-grid">
+                    <!-- Subject fields will be generated here by script.js -->
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-calendar-check"></i> Generate Timetable
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset Form
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="info-section">
+    <div class="container">
+        <h2>About Academic Timetable Generator</h2>
+        <p>Our timetable generator creates academic schedules for educational institutions. It handles theory lectures, lab sessions, and tutorials with faculty assignments. *Note: Current algorithm uses simple rotation and break insertion.*</p>
+
+        <div class="info-cards">
+            <div class="info-card">
+                <i class="fas fa-clock"></i>
+                <h3>Smart Timing</h3>
+                <p>Automatically schedules breaks after approximately 3 consecutive hours of classes.</p>
+            </div>
+
+            <div class="info-card">
+                <i class="fas fa-user-tie"></i>
+                <h3>Faculty Assignment</h3>
+                <p>Assigns the specified faculty to each subject.</p>
+            </div>
+
+            <div class="info-card">
+                <i class="fas fa-file-export"></i>
+                <h3>Export Options</h3>
+                <p>Download your generated timetable as basic PDF or CSV.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initial call on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.updateSubjectFields === 'function') {
+            window.updateSubjectFields();
+        }
+
+        // Add listener for academic year change
+        const academicYearSelect = document.getElementById('academic_year');
+        if (academicYearSelect) {
+            academicYearSelect.addEventListener('change', function() {
+                const year = parseInt(this.value);
+                const defaultTimes = {
+                    1: "08:00",
+                    2: "09:00", // Adjusted default times slightly
+                    3: "09:00",
+                    4: "10:00"
+                };
+                const startTimeField = document.getElementById('start_time');
+                if (startTimeField) {
+                    startTimeField.value = defaultTimes[year] || "09:00"; // Fallback
+                }
+            });
+            // Trigger change once on load to set initial time based on default year
+             academicYearSelect.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
+{% endblock %}

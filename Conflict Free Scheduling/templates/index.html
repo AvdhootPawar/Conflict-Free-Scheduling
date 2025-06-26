@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Conflict Free Scheduling - Academic & Club Scheduling{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Conflict Free Scheduling</h1>
+        <p>Professional scheduling solutions for academic institutions</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('academic_timetable') }}" class="btn btn-primary">
+                <i class="fas fa-calendar-alt"></i> Academic Timetable
+            </a>
+            <a href="{{ url_for('club_scheduler') }}" class="btn btn-secondary">
+                <i class="fas fa-users"></i> Club Scheduler
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <h2 class="section-title">Our Features</h2>
+        <div class="feature-cards">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-week"></i>
+                </div>
+                <h3>Academic Timetable Generator</h3>
+                <p>Create optimized academic schedules with faculty assignments for any educational institution.</p>
+                <ul>
+                    <li>Multiple class types (Theory, Lab, Tutorial)</li>
+                    <li>Faculty assignment</li>
+                    <li>Automatic break scheduling</li>
+                    <li>Export to PDF and CSV</li>
+                </ul>
+                <a href="{{ url_for('academic_timetable') }}" class="btn-link">Try Now <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Club Event Scheduler</h3>
+                <p>Efficiently manage and schedule club events across multiple venues and time slots.</p>
+                <ul>
+                    <li>Fair distribution of time slots</li>
+                    <li>Venue management</li>
+                    <li>Conflict prevention</li>
+                    <li>Export to PDF and CSV</li>
+                </ul>
+                <a href="{{ url_for('club_scheduler') }}" class="btn-link">Try Now <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-export"></i>
+                </div>
+                <h3>Export & Share</h3>
+                <p>Export your schedules in different formats for easy sharing and distribution.</p>
+                <ul>
+                    <li>PDF documents with professional formatting</li>
+                    <li>CSV files for data manipulation</li>
+                    <li>Clean tabular display</li>
+                    <li>Day-by-day organization</li>
+                </ul>
+                <a href="#" class="btn-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Enter Your Requirements</h3>
+                    <p>Provide details about your academic schedule or club events including subjects, faculty, venues, and time preferences.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Generate Optimized Schedule</h3>
+                    <p>Our intelligent algorithm creates the best possible schedule based on your inputs, avoiding conflicts and ensuring fair distribution.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Review & Export</h3>
+                    <p>Review the generated schedule, make any necessary adjustments, and export it in your preferred format.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container">
+        <h2>Ready to Simplify Your Scheduling?</h2>
+        <p>Create your first schedule in minutes</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('academic_timetable') }}" class="btn btn-primary">Academic Timetable</a>
+            <a href="{{ url_for('club_scheduler') }}" class="btn btn-secondary">Club Scheduler</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

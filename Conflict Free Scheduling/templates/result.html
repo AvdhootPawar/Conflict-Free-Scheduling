@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Generated Schedule - Schedule Master{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tabs-container {
+        margin-bottom: 2rem;
+        background-color: #fff; /* Add background to container */
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+    }
+    .tab-links {
+        display: flex;
+        flex-wrap: wrap;
+        border-bottom: 2px solid #ddd;
+        margin-bottom: 1.5rem; /* Increased margin */
+    }
+    .tab-link {
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        font-weight: 600; /* Bolder */
+        color: var(--secondary-color); /* Dim inactive tabs */
+        border: 2px solid transparent;
+        border-bottom: none;
+        margin-right: 0.5rem;
+        margin-bottom: -2px; /* Overlap border */
+        transition: all 0.2s ease;
+        border-radius: 4px 4px 0 0; /* Slight rounding */
+        background-color: #f8f9fa; /* Light bg for inactive */
+    }
+    .tab-link:hover {
+        background-color: #e9ecef;
+        color: var(--primary-dark);
+    }
+    .tab-link.active {
+        background-color: #fff; /* Match container bg */
+        color: var(--primary-color);
+        border-color: #ddd;
+        border-bottom-color: #fff; /* Hide bottom border part */
+    }
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.5s; /* Add fade */
+    }
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem; /* Space above table */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+    }
+    .schedule-table th, .schedule-table td {
+        padding: 0.8rem 1rem; /* Adjusted padding */
+        text-align: left;
+        border: 1px solid #e9ecef; /* Lighter border */
+        vertical-align: middle; /* Align vertically */
+    }
+    .schedule-table th {
+        background-color: #f5f7ff; /* Lighter blue/grey */
+        font-weight: 600;
+        font-size: 0.95rem; /* Slightly smaller header */
+        color: var(--dark-color);
+    }
+    .schedule-table tr:nth-child(even) td { /* Target td for striping */
+        background-color: #fdfdff; /* Very subtle striping */
+    }
+    .schedule-table tr:hover td { /* Target td for hover */
+        background-color: #f0f3ff; /* Light hover */
+    }
+    .schedule-table td {
+        font-size: 0.9rem; /* Smaller text */
+    }
+    .result-actions h3 {
+        color: var(--dark-color); /* Ensure title color */
+    }
+    .no-events {
+        text-align: center;
+        padding: 2rem;
+        color: var(--secondary-color);
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        {% if result_type == 'timetable' %}
+            <h1><i class="fas fa-calendar-check"></i> Academic Timetable Generated</h1>
+            <p>Your academic timetable has been successfully generated.</p>
+        {% else %}
+            <h1><i class="fas fa-calendar-check"></i> Club Event Schedule Generated</h1>
+            <p>Your club event schedule has been successfully generated.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="result-section">
+    <div class="container">
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            {% if result_type == 'timetable' %}
+                Timetable generated for Year {{ academic_year }} (Mode: {{ mode }})
+            {% else %}
+                Club Event Schedule generated successfully! Check the tabs below.
+            {% endif %}
+        </div>
+
+        <div class="result-actions">
+            <h3>{{ title }}</h3>
+            <div class="export-buttons">
+                <button id="downloadPdf" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+                <button id="downloadCsv" class="btn btn-secondary">
+                    <i class="fas fa-file-csv"></i> Download CSV
+                </button>
+                {% if result_type == 'timetable' %}
+                    <a href="{{ url_for('academic_timetable') }}" class="btn btn-outline">
+                        <i class="fas fa-sync-alt"></i> New Timetable
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('club_scheduler') }}" class="btn btn-outline">
+                        <i class="fas fa-sync-alt"></i> New Schedule
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tab-links">
+                {% for day in days %}
+                    {# Make sure openTab function (now in script.js) is called #}
+                    <div class="tab-link {% if loop.first %}active{% endif %}" onclick="openTab(event, 'day-{{ loop.index }}')">
+                        {% if result_type == 'timetable' %}{{ day }}{% else %}{{ day }}{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% for day in days %}
+                <div id="day-{{ loop.index }}" class="tab-content {% if loop.first %}active{% endif %}">
+                    {% set day_items = data | selectattr("Day", "equalto", day) | list %}
+                    {% if day_items %}
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    {% if result_type == 'timetable' %}
+                                        <th>Time</th>
+                                        <th>Subject</th>
+                                        <th>Faculty</th>
+                                    {% else %}
+                                        <th>Time</th>
+                                        <th>Club</th>
+                                        <th>Venue</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in day_items | sort(attribute='Start Time') %}
+                                    <tr>
+                                        <td>{{ item['Start Time'] }} - {{ item['End Time'] }}</td>
+                                        {% if result_type == 'timetable' %}
+                                            <td>{{ item.Subject }}</td>
+                                            <td>{{ item.Faculty }}</td>
+                                        {% else %}
+                                            <td>{{ item.Club }}</td>
+                                            <td>{{ item.Venue }}</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                     {% else %}
+                        <p class="no-events">No events scheduled for {{ day }}.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const downloadPdfBtn = document.getElementById('downloadPdf');
+        const downloadCsvBtn = document.getElementById('downloadCsv');
+
+        function showLoading(button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        }
+
+        function hideLoading(button, originalHtml) {
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        }
+
+        if (downloadPdfBtn) {
+            const originalPdfHtml = downloadPdfBtn.innerHTML;
+            downloadPdfBtn.addEventListener('click', function() {
+                showLoading(this);
+                fetch('{{ url_for("download_pdf") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: '{{ result_type }}',
+                        title: '{{ title }}',
+                        data: {{ data | tojson | safe }}
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    hideLoading(this, originalPdfHtml);
+                    if (result.success && result.data) {
+                        const byteCharacters = atob(result.data);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], {type: 'application/pdf'});
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = '{{ "timetable.pdf" if result_type == "timetable" else "club_schedule.pdf" }}';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                    } else {
+                        alert('Failed to generate PDF: ' + (result.error || 'Unknown error from server'));
+                    }
+                })
+                .catch(error => {
+                    hideLoading(this, originalPdfHtml);
+                    console.error('Error downloading PDF:', error);
+                    alert('An error occurred while generating the PDF. Check console. Error: ' + error.message);
+                });
+            });
+        }
+
+        if (downloadCsvBtn) {
+            const originalCsvHtml = downloadCsvBtn.innerHTML;
+            downloadCsvBtn.addEventListener('click', function() {
+                showLoading(this);
+                fetch('{{ url_for("download_csv") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        data: {{ data | tojson | safe }}
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    hideLoading(this, originalCsvHtml);
+                    if (result.success && result.data) {
+                        const blob = new Blob([result.data], { type: 'text/csv;charset=utf-8;' });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = '{{ "timetable.csv" if result_type == "timetable" else "club_schedule.csv" }}';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
+                    } else {
+                        alert('Failed to generate CSV: ' + (result.error || 'Unknown error from server'));
+                    }
+                })
+                .catch(error => {
+                    hideLoading(this, originalCsvHtml);
+                    console.error('Error downloading CSV:', error);
+                    alert('An error occurred while generating the CSV. Check console. Error: ' + error.message);
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

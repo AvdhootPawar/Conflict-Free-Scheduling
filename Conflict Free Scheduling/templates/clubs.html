@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}College Club Event Scheduler - Schedule Master{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-users"></i> College Club Event Scheduler</h1>
+        <p>Automatically schedule events for multiple clubs across available venues and time slots.</p>
+    </div>
+</section>
+
+<section class="form-section">
+    <div class="container">
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form id="clubForm" action="{{ url_for('club_scheduler') }}" method="post">
+            <div class="form-card config-card"> <!-- Single card for config -->
+                <h3><i class="fas fa-cog"></i> Configuration</h3>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="num_clubs">Number of Clubs:</label>
+                        <input type="number" id="num_clubs" name="num_clubs" min="1" value="3" class="form-control" onchange="window.updateClubFields()" required>
+                    </div>
+                    <div class="form-group half">
+                        <label for="num_venues">Number of Venues:</label>
+                        <input type="number" id="num_venues" name="num_venues" min="1" value="2" class="form-control" onchange="window.updateVenueFields()" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="num_days">Number of Event Days:</label>
+                        <input type="number" id="num_days" name="num_days" min="1" value="3" class="form-control" required>
+                    </div>
+                    <div class="form-group half">
+                        <label for="slots_per_day">Max Time Slots per Day:</label>
+                        <input type="number" id="slots_per_day" name="slots_per_day" min="1" value="4" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="event_duration">Event Duration (hours):</label>
+                        <input type="number" id="event_duration" name="event_duration" min="0.5" step="0.25" value="2.0" class="form-control" required>
+                    </div>
+                    <div class="form-group half">
+                        <label for="start_time">Daily Start Time:</label>
+                        <input type="time" id="start_time" name="start_time" value="09:00" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="events_per_club">Events per Club (Total):</label>
+                    <input type="number" id="events_per_club" name="events_per_club" min="1" value="2" class="form-control" required>
+                    <small class="form-text">Total number of events each club needs scheduled over the period.</small>
+                </div>
+            </div>
+
+
+            <div class="form-card" id="clubCard">
+                <h3><i class="fas fa-users"></i> Club Information</h3>
+                <div id="clubContainer" class="clubs-grid">
+                    <!-- Club fields will be generated here by script.js -->
+                </div>
+            </div>
+
+            <div class="form-card" id="venueCard">
+                <h3><i class="fas fa-map-marker-alt"></i> Venue Information</h3>
+                <div id="venueContainer" class="venues-grid">
+                    <!-- Venue fields will be generated here by script.js -->
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-calendar-check"></i> Generate Schedule
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset Form
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="info-section">
+    <div class="container">
+        <h2>About Club Event Scheduler</h2>
+        <p>Our club event scheduler creates fair and efficient schedules for college clubs, ensuring maximum utilization of venues and time slots based on your inputs.</p>
+
+        <div class="info-cards">
+            <div class="info-card">
+                <i class="fas fa-random"></i>
+                <h3>Fair Distribution Attempt</h3>
+                <p>Events are distributed among clubs trying to fulfill the requested count per club within available slots.</p>
+            </div>
+
+            <div class="info-card">
+                <i class="fas fa-ban"></i>
+                <h3>Conflict Prevention</h3>
+                <p>The system prevents scheduling the same venue at the same time slot automatically.</p>
+            </div>
+
+            <div class="info-card">
+                <i class="fas fa-file-export"></i>
+                <h3>Export Options</h3>
+                <p>Download your generated schedule as basic PDF or CSV.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize fields on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.updateClubFields === 'function') {
+            window.updateClubFields();
+        }
+        if (typeof window.updateVenueFields === 'function') {
+            window.updateVenueFields();
+        }
+    });
+</script>
+{% endblock %}
