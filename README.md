@@ -88,3 +88,5 @@ This project is a comprehensive scheduling tool designed to assist academic inst
 - Configurable constraints and safety limits
 
 ---
+![Screenshot 2025-06-26 201142](https://github.com/user-attachments/assets/f481bf9f-9b8b-4e7b-8d7d-4f6e70974cd4)
+
