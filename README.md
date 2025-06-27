@@ -88,5 +88,20 @@ This project is a comprehensive scheduling tool designed to assist academic inst
 - Configurable constraints and safety limits
 
 ---
+## Screenshots
+
+### 1. Main Page
 ![Screenshot 2025-06-26 201142](https://github.com/user-attachments/assets/f481bf9f-9b8b-4e7b-8d7d-4f6e70974cd4)
+![Screenshot 2025-06-27 121210](https://github.com/user-attachments/assets/adedeb37-7b1e-4acb-a687-d0ce6c80fa24)
+
+### 2. Input Section
+![Screenshot 2025-06-27 121509](https://github.com/user-attachments/assets/f1ca3f89-6a8e-4cfe-bb08-4aca247128fb)
+![Screenshot 2025-06-27 121531](https://github.com/user-attachments/assets/0f1672af-a1e3-4823-ad50-938e42fb3ecd)
+
+### 3. Output - Academic Timetable
+![Screenshot 2025-06-27 121603](https://github.com/user-attachments/assets/f2bab835-e2cb-4f33-bd8c-89944b618aac)
+
+
+
+
 
